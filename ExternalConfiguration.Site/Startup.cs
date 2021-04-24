@@ -13,8 +13,13 @@ namespace ExternalConfiguration.Site
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly IServiceProvider _serviceProvider;
+
+        public Startup(
+            IConfiguration configuration,
+            IServiceProvider serviceProvider)
         {
+            _serviceProvider = serviceProvider;
             Configuration = configuration;
         }
 
@@ -23,6 +28,11 @@ namespace ExternalConfiguration.Site
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // read custom configuration
+            var env = _serviceProvider.GetService<IHostEnvironment>();
+            var contentRoot = env.ContentRootPath;
+            string jsonFileName = "site.json";
+            new ConfigurationBuilder().AddJsonFile(jsonFileName)
             services.AddControllersWithViews();
         }
 
