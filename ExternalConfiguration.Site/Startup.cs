@@ -8,18 +8,20 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace ExternalConfiguration.Site
 {
     public class Startup
     {
-        private readonly IServiceProvider _serviceProvider;
+        // ref https://stackoverflow.com/questions/52040742/get-wwwroot-path-when-in-configureservices-aspnetcore
+        private readonly IHostEnvironment _env;
 
         public Startup(
             IConfiguration configuration,
-            IServiceProvider serviceProvider)
+            IHostEnvironment env)
         {
-            _serviceProvider = serviceProvider;
+            _env = env;
             Configuration = configuration;
         }
 
@@ -28,11 +30,11 @@ namespace ExternalConfiguration.Site
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // read custom configuration
-            var env = _serviceProvider.GetService<IHostEnvironment>();
-            var contentRoot = env.ContentRootPath;
-            string jsonFileName = "site.json";
-            new ConfigurationBuilder().AddJsonFile(jsonFileName)
+           // site.json的設定值，在 program.cs裡已設定好
+            string author = Configuration.GetValue<string>("author");
+            
+            Console.WriteLine($"Author={author}");
+            
             services.AddControllersWithViews();
         }
 
